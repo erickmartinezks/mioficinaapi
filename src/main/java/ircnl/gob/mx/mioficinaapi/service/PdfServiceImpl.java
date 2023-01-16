@@ -28,9 +28,9 @@ public class PdfServiceImpl implements PdfService {
 	
 	@Override
 	public byte[] generarOficioGeneral(String personaDestinoNombreCompleto, String personaDestinoCargo,
-			String personaDestinoDependencia, String numeroOficio, String asunto, String parrafo1, String parrafo2,
+			String personaDestinoDependencia, String numeroOficio, String asunto, String parrafo,
 			String despedida, String personaOrigenNombreCompleto, String personaOrigenCargo,
-			String personaOrigenDependencia, String personaOrigenUbicacion) throws IOException, JRException {
+			String personaOrigenDependencia, String personaOrigenUbicacion, String personaOrigenTelefono) throws IOException, JRException {
 		
 		log.info("generarOficioGeneral");
 		log.info("Begin generarPdf");

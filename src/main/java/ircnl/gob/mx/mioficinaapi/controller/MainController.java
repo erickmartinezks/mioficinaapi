@@ -40,21 +40,20 @@ public class MainController {
 			@RequestPart ("personaDestinoDependencia") String personaDestinoDependencia,
 			@RequestPart ("numeroOficio") String numeroOficio,
 			@RequestPart ("asunto") String asunto,
-			@RequestPart ("parrafo1") String parrafo1,
-			@RequestPart ("parrafo2") String parrafo2,
+			@RequestPart ("parrafo") String parrafo,
 			@RequestPart ("despedida") String despedida,
 			@RequestPart ("personaOrigenNombreCompleto") String personaOrigenNombreCompleto,
 			@RequestPart ("personaOrigenCargo") String personaOrigenCargo,
 			@RequestPart ("personaOrigenDependencia") String personaOrigenDependencia,
-			@RequestPart ("personaOrigenUbicacion") String personaOrigenUbicacion
-			
+			@RequestPart ("personaOrigenUbicacion") String personaOrigenUbicacion,
+			@RequestPart ("personaOrigenTelefono") String personaOrigenTelefono
 			) throws IOException, JRException {
 		
 		log.info("generarOficioGeneral");
 		return pdfService.generarOficioGeneral(personaDestinoNombreCompleto, personaDestinoCargo, 
-				personaDestinoDependencia, numeroOficio, asunto, parrafo1, parrafo2, despedida, 
+				personaDestinoDependencia, numeroOficio, asunto, parrafo, despedida, 
 				personaOrigenNombreCompleto, personaOrigenCargo, 
-				personaOrigenDependencia, personaOrigenUbicacion);
+				personaOrigenDependencia, personaOrigenUbicacion, personaOrigenTelefono);
 	}
 	
 }

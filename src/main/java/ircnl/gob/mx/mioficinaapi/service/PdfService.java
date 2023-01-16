@@ -15,13 +15,13 @@ public interface PdfService {
 			String personaDestinoDependencia, 
 			String numeroOficio, 
 			String asunto, 
-			String parrafo1, 
-			String parrafo2, 
+			String parrafo,
 			String despedida, 
 			String personaOrigenNombreCompleto, 
 			String personaOrigenCargo, 
 			String personaOrigenDependencia, 
-			String personaOrigenUbicacion) throws IOException, JRException;
+			String personaOrigenUbicacion,
+			String personaOrigenTelefono) throws IOException, JRException;
 	
 	/*
 	byte[] generarPdf(MultipartFile personaImagen, String personaNombres, String personaApellidos, String personaDepartamento, String personaNumeroEmpleado, String leftPadding, String topPadding, 
