@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -44,7 +45,6 @@ public class PdfServiceImpl implements PdfService {
 	
 	@Override
 	public byte[] generarOficioGeneral(PayloadOficioGeneral payload) throws IOException, JRException {
-		generarImagenQr();
 		log.info("generarOficioGeneral");
 		log.info("Begin generarPdf");
 		String urlJasper = "/static/reportes/gafetesRechumDoble.jasper";
@@ -52,7 +52,6 @@ public class PdfServiceImpl implements PdfService {
 		Map<String, Object> parametros = new HashMap<String, Object>();
 		String urlPlantillaGafet = new ClassPathResource("/static/reportes/imagenes/plantilla_gafet_ultima.png").getFile().getPath();
 		String urlPlantillaGafetReverso = new ClassPathResource("/static/reportes/imagenes/plantilla_gafet_reverso.jpg").getFile().getPath();
-		
 
 		LocalDate fecha = LocalDate.now();
 		Month mes = fecha.getMonth();
@@ -61,7 +60,7 @@ public class PdfServiceImpl implements PdfService {
 		String strFecha = fecha.getDayOfMonth() + " de " + nombreMes + " de " + fecha.getYear();
 		// System.out.println("Fecha completa: " + strFecha);
 		
-		parametros.putAll(new HashMap<String, String>());
+		parametros.putAll(generarImagenQr());
 		parametros.put("personaDestinoNombreCompleto", payload.getPersonaDestinoNombreCompleto());
 		parametros.put("personaDestinoCargo", payload.getPersonaDestinoCargo());
 		parametros.put("personaDestinoDependencia", payload.getPersonaDestinoDependencia());
@@ -113,12 +112,11 @@ public class PdfServiceImpl implements PdfService {
 		response.put("contenidoQr", "");
 		try {
 			
-			String randomHexadecimalText = "Texto de prueba";
+			String randomHexadecimalText = generarHexadecimal();
 	    	QRCodeWriter barcodeWriter = new QRCodeWriter();
 	        BitMatrix bitMatrix = barcodeWriter.encode(randomHexadecimalText, BarcodeFormat.QR_CODE, 200, 200);
 	
 	        File outputFile = new File(folderRepositorio + File.separator + randomHexadecimalText + ".png" );
-	        		// "C:\\\\Users\\erick.martinez\\Documents\\Procesos\\Gafetes\\imagenes\\qrPrueba.png");
 		    ImageIO.write(MatrixToImageWriter.toBufferedImage(bitMatrix), "png", outputFile);
 		
 		    response.put("pathQr", outputFile.getAbsolutePath());
@@ -131,5 +129,18 @@ public class PdfServiceImpl implements PdfService {
 		return response; 
 	}
 	
+	private String generarHexadecimal() {
+		String hexadecimal = "";
+		int num = 0;
+		Random random = new Random();
+		
+        for (int i = 0; i < 4; i++)
+        {
+        	num = random.nextInt(0, Integer.MAX_VALUE);
+            hexadecimal += String.format("%4X", num);
+        }
+        
+		return hexadecimal;
+	}
 	
 }
