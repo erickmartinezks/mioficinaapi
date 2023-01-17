@@ -1,6 +1,7 @@
 package ircnl.gob.mx.mioficinaapi.service;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Month;
@@ -43,10 +44,12 @@ public class PdfServiceImpl implements PdfService {
 	@Value("${folder.repositorio}")
 	private String folderRepositorio;
 	
+	@Value("${preurl.qr}")
+	private String preurlQr;
+	
 	@Override
 	public byte[] generarOficioGeneral(PayloadOficioGeneral payload) throws IOException, JRException {
-		log.info("generarOficioGeneral");
-		log.info("Begin generarPdf");
+		log.info("Begin generarOficioGeneral");
 		String urlJasper = "/static/reportes/gafetesRechumDoble.jasper";
 		
 		Map<String, Object> parametros = new HashMap<String, Object>();
@@ -74,7 +77,15 @@ public class PdfServiceImpl implements PdfService {
 		parametros.put("personaOrigenUbicacion", payload.getPersonaOrigenUbicacion());
 		parametros.put("cadenaFecha", strFecha);
 		
-		return  JasperExportManager.exportReportToPdf(generarJasperPrint(urlJasper, parametros, null));
+		// TODO remove (DEV)
+		parametros.put("plantilla_gafet", urlPlantillaGafet);
+		parametros.put("plantilla_gafet_reverso", urlPlantillaGafetReverso);
+		
+		byte [] response = JasperExportManager.exportReportToPdf(generarJasperPrint(urlJasper, parametros, null));
+		guardarOficioRepositorio(parametros.get("contenidoQr").toString(), response);
+		
+		log.info("End generarOficioGeneral");
+		return  response;
 	}
 	
 	private JasperPrint generarJasperPrint(String urlJasper, Map<String, Object> parametros,
@@ -108,13 +119,14 @@ public class PdfServiceImpl implements PdfService {
 
 	private HashMap<String, String> generarImagenQr() {
 		HashMap<String, String> response = new HashMap<>();
+		log.info("Begin generarImagenQr");
 		response.put("pathQr", "");
 		response.put("contenidoQr", "");
 		try {
 			
 			String randomHexadecimalText = generarHexadecimal();
 	    	QRCodeWriter barcodeWriter = new QRCodeWriter();
-	        BitMatrix bitMatrix = barcodeWriter.encode(randomHexadecimalText, BarcodeFormat.QR_CODE, 200, 200);
+	        BitMatrix bitMatrix = barcodeWriter.encode(preurlQr + randomHexadecimalText, BarcodeFormat.QR_CODE, 200, 200);
 	
 	        File outputFile = new File(folderRepositorio + File.separator + randomHexadecimalText + ".png" );
 		    ImageIO.write(MatrixToImageWriter.toBufferedImage(bitMatrix), "png", outputFile);
@@ -126,10 +138,12 @@ public class PdfServiceImpl implements PdfService {
 	    	log.warn("generarImagenQr - Se generó un error al generar la imagen QR: [" + err.getMessage() + "]");
 	    }
 		
+		log.info("End generarImagenQr");
 		return response; 
 	}
 	
 	private String generarHexadecimal() {
+		log.info("Begin generarHexadecimal");
 		String hexadecimal = "";
 		int num = 0;
 		Random random = new Random();
@@ -140,7 +154,18 @@ public class PdfServiceImpl implements PdfService {
             hexadecimal += String.format("%4X", num);
         }
         
+        log.info("End generarHexadecimal");
 		return hexadecimal;
 	}
+	
+	private void guardarOficioRepositorio(String nombrePdf, byte[] pdfByteArray) {
+		File outputFile = new File(folderRepositorio + File.separator + nombrePdf + ".pdf" );
+		try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
+		    outputStream.write(pdfByteArray);
+		} catch (Exception err) {
+			log.warn("Error al guardar el oficio en el repositorio. [ " + err.getMessage() + " ]" );
+		}	
+	}
+	
 	
 }
