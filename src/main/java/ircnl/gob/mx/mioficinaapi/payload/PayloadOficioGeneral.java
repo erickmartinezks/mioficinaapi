@@ -7,13 +7,13 @@ public class PayloadOficioGeneral {
 	private String personaDestinoDependencia;
 	private String numeroOficio;
 	private String asunto;
-	private String parrafo1;
-	private String parrafo2;
+	private String parrafo;
 	private String despedida;
 	private String personaOrigenNombreCompleto;
 	private String personaOrigenCargo;
 	private String personaOrigenDependencia;
 	private String personaOrigenUbicacion;
+	private String personaOrigenTelefono;
 
 	public String getPersonaDestinoNombreCompleto() {
 		return personaDestinoNombreCompleto;
@@ -55,20 +55,12 @@ public class PayloadOficioGeneral {
 		this.asunto = asunto;
 	}
 
-	public String getParrafo1() {
-		return parrafo1;
+	public String getParrafo() {
+		return parrafo;
 	}
 
-	public void setParrafo1(String parrafo1) {
-		this.parrafo1 = parrafo1;
-	}
-
-	public String getParrafo2() {
-		return parrafo2;
-	}
-
-	public void setParrafo2(String parrafo2) {
-		this.parrafo2 = parrafo2;
+	public void setParrafo(String parrafo) {
+		this.parrafo = parrafo;
 	}
 
 	public String getDespedida() {
@@ -109,6 +101,14 @@ public class PayloadOficioGeneral {
 
 	public void setPersonaOrigenUbicacion(String personaOrigenUbicacion) {
 		this.personaOrigenUbicacion = personaOrigenUbicacion;
+	}
+
+	public String getPersonaOrigenTelefono() {
+		return personaOrigenTelefono;
+	}
+
+	public void setPersonaOrigenTelefono(String personaOrigenTelefono) {
+		this.personaOrigenTelefono = personaOrigenTelefono;
 	}
 
 }
