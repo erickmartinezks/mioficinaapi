@@ -5,7 +5,6 @@ public class PayloadOficioGeneral {
 	private String personaDestinoNombreCompleto;
 	private String personaDestinoCargo;
 	private String personaDestinoDependencia;
-	private String numeroOficio;
 	private String asunto;
 	private String parrafo;
 	private String despedida;
@@ -14,6 +13,11 @@ public class PayloadOficioGeneral {
 	private String personaOrigenDependencia;
 	private String personaOrigenUbicacion;
 	private String personaOrigenTelefono;
+	private String idOficioRecibido;
+	private String idDependenciaDestino;
+	private String idSecretariaDestino;
+	private String idDependenciaOrigen;
+	private String idSecretariaOrigen;
 
 	public String getPersonaDestinoNombreCompleto() {
 		return personaDestinoNombreCompleto;
@@ -37,14 +41,6 @@ public class PayloadOficioGeneral {
 
 	public void setPersonaDestinoDependencia(String personaDestinoDependencia) {
 		this.personaDestinoDependencia = personaDestinoDependencia;
-	}
-
-	public String getNumeroOficio() {
-		return numeroOficio;
-	}
-
-	public void setNumeroOficio(String numeroOficio) {
-		this.numeroOficio = numeroOficio;
 	}
 
 	public String getAsunto() {
@@ -109,6 +105,46 @@ public class PayloadOficioGeneral {
 
 	public void setPersonaOrigenTelefono(String personaOrigenTelefono) {
 		this.personaOrigenTelefono = personaOrigenTelefono;
+	}
+
+	public String getIdOficioRecibido() {
+		return idOficioRecibido;
+	}
+
+	public void setIdOficioRecibido(String idOficioRecibido) {
+		this.idOficioRecibido = idOficioRecibido;
+	}
+
+	public String getIdDependenciaDestino() {
+		return idDependenciaDestino;
+	}
+
+	public void setIdDependenciaDestino(String idDependenciaDestino) {
+		this.idDependenciaDestino = idDependenciaDestino;
+	}
+
+	public String getIdSecretariaDestino() {
+		return idSecretariaDestino;
+	}
+
+	public void setIdSecretariaDestino(String idSecretariaDestino) {
+		this.idSecretariaDestino = idSecretariaDestino;
+	}
+
+	public String getIdDependenciaOrigen() {
+		return idDependenciaOrigen;
+	}
+
+	public void setIdDependenciaOrigen(String idDependenciaOrigen) {
+		this.idDependenciaOrigen = idDependenciaOrigen;
+	}
+
+	public String getIdSecretariaOrigen() {
+		return idSecretariaOrigen;
+	}
+
+	public void setIdSecretariaOrigen(String idSecretariaOrigen) {
+		this.idSecretariaOrigen = idSecretariaOrigen;
 	}
 
 }

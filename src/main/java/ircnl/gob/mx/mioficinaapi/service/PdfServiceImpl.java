@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Collection;
@@ -16,6 +17,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 import ircnl.gob.mx.mioficinaapi.payload.PayloadOficioGeneral;
+import ircnl.gob.mx.mioficinaapi.repository.OficiosGeneradosRepository;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
@@ -47,42 +50,67 @@ public class PdfServiceImpl implements PdfService {
 	@Value("${preurl.qr}")
 	private String preurlQr;
 	
+	@Autowired
+	OficiosGeneradosRepository oficiosGeneradosRepository;
+	
 	@Override
 	public byte[] generarOficioGeneral(PayloadOficioGeneral payload) throws IOException, JRException {
 		log.info("Begin generarOficioGeneral");
-		String urlJasper = "/static/reportes/gafetesRechumDoble.jasper";
+		String urlJasper = "/static/reportes/oficio.jasper";
 		
 		Map<String, Object> parametros = new HashMap<String, Object>();
-		String urlPlantillaGafet = new ClassPathResource("/static/reportes/imagenes/plantilla_gafet_ultima.png").getFile().getPath();
-		String urlPlantillaGafetReverso = new ClassPathResource("/static/reportes/imagenes/plantilla_gafet_reverso.jpg").getFile().getPath();
+		// String urlPlantillaGafet = new ClassPathResource("/static/reportes/imagenes/plantilla_gafet_ultima.png").getFile().getPath();
+		// String urlPlantillaGafetReverso = new ClassPathResource("/static/reportes/imagenes/plantilla_gafet_reverso.jpg").getFile().getPath();
 
 		LocalDate fecha = LocalDate.now();
 		Month mes = fecha.getMonth();
 		String nombreMes = mes.getDisplayName(TextStyle.FULL, new Locale("es", "ES"));
 		nombreMes = nombreMes.substring(0,1).toUpperCase() + nombreMes.substring(1);
-		String strFecha = fecha.getDayOfMonth() + " de " + nombreMes + " de " + fecha.getYear();
-		// System.out.println("Fecha completa: " + strFecha);
-		
+		String strFecha = fecha.getDayOfMonth() + " de " + nombreMes + " del " + fecha.getYear();
 		parametros.putAll(generarImagenQr());
+		
+		String numeroOficio = oficiosGeneradosRepository.callOFSPA_OficiosGenerados(
+				"", // cuentaUsuario
+				payload.getAsunto(),// asunto
+				payload.getIdSecretariaOrigen(), // idSriaProc
+				"", // SriaProc
+				payload.getIdDependenciaOrigen(), // idDepciaProc
+				payload.getPersonaOrigenDependencia(),// depciaProc
+				10, // idTipoOf
+				"",	// tipoOf
+				1,// idEstatusOf
+				"",	// estatusOf
+				payload.getIdDependenciaDestino(), // idDepciaAsig
+				payload.getPersonaOrigenDependencia(),	// depciaAsig
+				"2023-01-26 13:40:00", // fechaOficio
+				payload.getPersonaDestinoNombreCompleto(), // dirigidoA
+				payload.getDespedida(), // despedida
+				Integer.parseInt(payload.getIdOficioRecibido()), // idOficioRecibido
+				parametros.get("cadenaQr").toString(), // nombreOficio
+				payload.getPersonaOrigenTelefono(), // telefonoOficioG
+				payload.getPersonaOrigenUbicacion(), // ubicacionOficioG
+				payload.getParrafo(), // parrafo
+				payload.getPersonaDestinoCargo(), // puestoDirigidoA
+				payload.getPersonaOrigenCargo(), // puestoRemitente
+				payload.getIdSecretariaOrigen()); // idSecretariaRemitent
+		
+		
+		parametros.put("numeroOficio", numeroOficio);
 		parametros.put("personaDestinoNombreCompleto", payload.getPersonaDestinoNombreCompleto());
 		parametros.put("personaDestinoCargo", payload.getPersonaDestinoCargo());
 		parametros.put("personaDestinoDependencia", payload.getPersonaDestinoDependencia());
-		parametros.put("numeroOficio", payload.getNumeroOficio());
 		parametros.put("asunto", payload.getAsunto());
-		parametros.put("parrafo1", payload.getParrafo());
+		parametros.put("parrafo", payload.getParrafo());
 		parametros.put("despedida", payload.getDespedida());
 		parametros.put("personaOrigenNombreCompleto", payload.getPersonaOrigenNombreCompleto());
 		parametros.put("personaOrigenCargo", payload.getPersonaOrigenCargo());
 		parametros.put("personaOrigenDependencia", payload.getPersonaOrigenDependencia());
 		parametros.put("personaOrigenUbicacion", payload.getPersonaOrigenUbicacion());
-		parametros.put("cadenaFecha", strFecha);
-		
-		// TODO remove (DEV)
-		parametros.put("plantilla_gafet", urlPlantillaGafet);
-		parametros.put("plantilla_gafet_reverso", urlPlantillaGafetReverso);
+		parametros.put("telefono", payload.getPersonaOrigenTelefono());
+		parametros.put("fecha", strFecha);
 		
 		byte [] response = JasperExportManager.exportReportToPdf(generarJasperPrint(urlJasper, parametros, null));
-		guardarOficioRepositorio(parametros.get("contenidoQr").toString(), response);
+		guardarOficioRepositorio(parametros.get("cadenaQr").toString(), response);
 		
 		log.info("End generarOficioGeneral");
 		return  response;
@@ -121,7 +149,7 @@ public class PdfServiceImpl implements PdfService {
 		HashMap<String, String> response = new HashMap<>();
 		log.info("Begin generarImagenQr");
 		response.put("pathQr", "");
-		response.put("contenidoQr", "");
+		response.put("cadenaQr", "");
 		try {
 			
 			String randomHexadecimalText = generarHexadecimal();
@@ -132,7 +160,7 @@ public class PdfServiceImpl implements PdfService {
 		    ImageIO.write(MatrixToImageWriter.toBufferedImage(bitMatrix), "png", outputFile);
 		
 		    response.put("pathQr", outputFile.getAbsolutePath());
-			response.put("contenidoQr", randomHexadecimalText);
+			response.put("cadenaQr", randomHexadecimalText);
 			log.info("Contenido de hashmap: " + response);
 		} catch (Exception err) {
 	    	log.warn("generarImagenQr - Se generó un error al generar la imagen QR: [" + err.getMessage() + "]");
